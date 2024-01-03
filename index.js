@@ -24,6 +24,9 @@ app.get("/OAI", async (request, response) => {
   <!DOCTYPE html>
   <html>
   <head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+NKo+Unjoined:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
   </head>
   <body>
@@ -55,7 +58,8 @@ app.post("/OAI", bodyParser, async (request, response) => {
     // console.log(messageHistory);
 
     const list = messageHistory.map(
-      (num) => `<li class="${num.role}">${num.content}</li>`
+      (num) => `<li class="${num.role}"><span class="id">${num.role.charAt(0).toUpperCase()
+        + num.role.slice(1)}:</span></br> ${num.content}</li>`
     );
     console.log(list);
     const html = `<ul class="chat">${list.join("")}</ul>`;
@@ -65,8 +69,11 @@ app.post("/OAI", bodyParser, async (request, response) => {
     <!DOCTYPE html>
     <html>
     <head>
-    <link rel="stylesheet" href="/style.css">
-    </head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+NKo+Unjoined:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">    
+</head>
     <body>
     <header>
     <form action="/OAI" method="POST">
