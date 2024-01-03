@@ -6,6 +6,9 @@ require("dotenv").config();
 const app = express();
 const { callOpenAi } = require("./openai");
 
+const staticHandler = express.static("public");
+app.use(staticHandler);
+
 const messageHistory = [];
 const addMsg = (id, msg) => {
   const result = {
@@ -15,96 +18,74 @@ const addMsg = (id, msg) => {
   messageHistory.unshift(result);
 };
 
-
-
 app.get("/OAI", async (request, response) => {
-  const html = "chat messages here";
+  const html = "";
   response.send(`
   <!DOCTYPE html>
   <html>
   <head>
-  <style>
-  </style>
+  <link rel="stylesheet" href="/style.css">
   </head>
   <body>
+  <header>
   <form action="/OAI" method="POST">
   <li>
-    <input type="text" id="message" name="message" />
-    <label for="message">message</label>
-  </li>
-  <li class="button">
-<button type="submit">ask a question</button>
+  <input type="text" id="message" name="message" placeholder="Message"/>
   </li>
   </form>
+  </header>
+  <main>
   ${html}
+  </main>
   </body>
-  </html> 
+  </html>   
   `);
 });
-
 const bodyParser = express.urlencoded({ extended: true });
 
 app.post("/OAI", bodyParser, async (request, response) => {
   const contentForOAI = request.body.message;
-  console.log("message entered", contentForOAI);
-  // addMsg("user", contentForOAI);
-
-  // const message = "what is clarity?";
+  // console.log("message entered", contentForOAI);
 
   try {
     const openaiResponse = await callOpenAi(contentForOAI);
-    console.log(openaiResponse);
+    // console.log(openaiResponse);
     addMsg("assistant", openaiResponse);
     addMsg("user", contentForOAI);
-    console.log(messageHistory);
+    // console.log(messageHistory);
 
-    const list = messageHistory.map((num) => `<li class="${num.role}">${num.role}: ${num.content}</li>`);
+    const list = messageHistory.map(
+      (num) => `<li class="${num.role}">${num.content}</li>`
+    );
     console.log(list);
-    const html = `<ul>${list.join("")}</ul>`;
+    const html = `<ul class="chat">${list.join("")}</ul>`;
     console.log(html);
 
     response.send(`
-  <!DOCTYPE html>
-  <html>
-  <head>
-  <style>
-  .user {color:red;}
-  .assistant {color:green;}
-  </style>
-  </head>
-  <body>
-  <form action="/OAI" method="POST">
-  <li>
-    <input type="text" id="message" name="message" />
-    <label for="message">message</label>
-  </li>
-
-  <li class="button">
-<button type="submit">ask a question</button>
-  </li>
-  </form>
-  ${html}
-  </body>
-  </html> 
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <link rel="stylesheet" href="/style.css">
+    </head>
+    <body>
+    <header>
+    <form action="/OAI" method="POST">
+    <li>
+    <input type="text" id="message" name="message" placeholder="Message"/>
+    </li>
+    </form>
+    </header>
+    <main>
+    ${html}
+    </main>
+    </body>
+    </html>  
   `);
   } catch (error) {
     response.status(500).json({ message: error.message });
   }
 });
 
-// app.get("/chatreq", async (req, res) => {
-//   // const message = req.body.message;
-//   // console.log("Received message from client:", message);
-//   const message = "what is clarity?";
-//   try {
-//     const openaiResponse = await callOpenAi(message);
-//     // console.log(openaiResponse);
-//     console.log(messageHistory);
-//     res.send(openaiResponse);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// });
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening at http://localhost:${port}`));
