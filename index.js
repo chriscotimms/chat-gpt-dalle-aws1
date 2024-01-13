@@ -5,9 +5,13 @@ const fetch = require("node-fetch");
 require("dotenv").config();
 const app = express();
 const { callOpenAi } = require("./openai");
+// const SecretsManager = require('./SecretsManager.js');
 
 const staticHandler = express.static("public");
 app.use(staticHandler);
+
+
+
 
 const messageHistory = [];
 const addMsg = (id, msg) => {
